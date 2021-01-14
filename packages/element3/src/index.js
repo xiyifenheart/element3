@@ -15,7 +15,7 @@ import { ElLink } from './components/Link'
 // Form
 import { ElRadio } from './components/Radio'
 import { ElRadioButton } from './components/RadioButton'
-import ElRadioGroup from '../packages/radio-group'
+import { ElRadioGroup } from './components/RadioGroup'
 import ElCheckbox from '../packages/checkbox'
 import ElCheckboxButton from '../packages/checkbox-button'
 import ElCheckboxGroup from '../packages/checkbox-group'
@@ -49,11 +49,11 @@ import { ElAvatar } from './components/Avatar'
 // Notice
 import ElAlert from '../packages/alert'
 
-import ElLoading, { useLoading } from '../packages/loading'
+import ElLoading from '../packages/loading'
 
 import { Message } from './components/Message'
 
-import ElMessageBox, { useMsgbox } from '../packages/message-box'
+import { Msgbox } from '../packages/message-box'
 
 import { Notification } from './components/Notification'
 // Navigation
@@ -189,10 +189,10 @@ const install = (app, opts = {}) => {
 
 function applyOptions(app) {
   app.config.globalProperties.$loading = ElLoading.service
-  app.config.globalProperties.$msgbox = ElMessageBox.service
-  app.config.globalProperties.$alert = ElMessageBox.service.alert
-  app.config.globalProperties.$confirm = ElMessageBox.service.confirm
-  app.config.globalProperties.$prompt = ElMessageBox.service.prompt
+  app.config.globalProperties.$msgbox = Msgbox
+  app.config.globalProperties.$alert = Msgbox.alert
+  app.config.globalProperties.$confirm = Msgbox.confirm
+  app.config.globalProperties.$prompt = Msgbox.prompt
   app.config.globalProperties.$notify = Notification
   app.config.globalProperties.$message = Message
 }
@@ -284,8 +284,7 @@ export {
   ElScrollbar,
   ElAutocomplete,
   Message,
-  useLoading,
-  useMsgbox,
+  Msgbox,
   Notification,
   install,
   setupGlobalOptions
