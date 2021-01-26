@@ -13,6 +13,22 @@ export const props = {
       return []
     }
   },
+  props: {
+    type: Object,
+    default() {
+      return {
+        key: 'key',
+        label: 'label',
+        disabled: 'disabled'
+      }
+    }
+  },
+  titles: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
   leftDefaultChecked: {
     type: Array,
     default() {

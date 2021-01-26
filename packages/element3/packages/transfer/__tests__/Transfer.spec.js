@@ -14,20 +14,23 @@ const getTestData = () => {
   return data
 }
 const createTransfer = (props, opts) => {
-  return Object.assign({
-    template: `
+  return Object.assign(
+    {
+      template: `
       <el-transfer :data="testData" ref="transfer" ${props}>
       </el-transfer>
     `,
-    components: {
-      'el-transfer': ElTransfer
-    },
-    data() {
-      return {
-        testData: getTestData()
+      components: {
+        'el-transfer': ElTransfer
+      },
+      data() {
+        return {
+          testData: getTestData()
+        }
       }
-    }
-  }, opts)
+    },
+    opts
+  )
 }
 
 describe('Transfer', () => {
@@ -45,6 +48,40 @@ describe('Transfer', () => {
     expect(transferLeft.findAll('.el-transfer-panel__item')).toHaveLength(15)
   })
 
+  it('props', () => {
+    const wrapper = mount({
+      template: `
+        <el-transfer :data="testData" ref="transfer" :props="props">
+        </el-transfer>
+      `,
+      components: {
+        'el-transfer': ElTransfer
+      },
+      data() {
+        return {
+          testData: [
+            {
+              customizeKey: 0,
+              customizeLabel: '备选项0',
+              customizeDisabled: true
+            }
+          ],
+          props: {
+            key: 'customizeKey',
+            label: 'customizeLabel',
+            disabled: 'customizeDisabled'
+          }
+        }
+      }
+    })
+
+    const transferPanel = wrapper.getComponent({ name: 'ElTransferPanel' }).vm
+
+    expect(transferPanel.keyProp).toEqual('customizeKey')
+    expect(transferPanel.labelProp).toEqual('customizeLabel')
+    expect(transferPanel.disabledProp).toEqual('customizeDisabled')
+  })
+
   it('default target list', () => {
     const Comp = createTransfer('v-model="value"', {
       setup() {
@@ -56,7 +93,7 @@ describe('Transfer', () => {
       }
     })
     const wrapper = mount(Comp)
-    const transfer = wrapper.getComponent({ name: 'ElTransfer'}).vm
+    const transfer = wrapper.getComponent({ name: 'ElTransfer' }).vm
 
     const transferLeft = wrapper.get('[data-test="transfer-panel-left"]')
     const transferRight = wrapper.get('[data-test="transfer-panel-right"]')
@@ -68,36 +105,46 @@ describe('Transfer', () => {
   })
 
   it('defaultChecked', () => {
-    const Comp = createTransfer('v-model="value" :left-default-checked="[2, 3]" :right-default-checked="[1, 4]"', {
-      setup() {
-        const state = reactive({
-          value: [1, 4]
-        })
+    const Comp = createTransfer(
+      'v-model="value" :left-default-checked="[2, 3]" :right-default-checked="[1, 4]"',
+      {
+        setup() {
+          const state = reactive({
+            value: [1, 4]
+          })
 
-        return toRefs(state)
+          return toRefs(state)
+        }
       }
-    })
+    )
     const wrapper = mount(Comp)
-    const transfer = wrapper.getComponent({ name: 'ElTransfer'})
-    const transferPanelLeft = transfer.getComponent({ ref: 'transfer-panel-left' }).vm
-    const transferPanelRight = transfer.getComponent({ ref: 'transfer-panel-right' }).vm
+    const transfer = wrapper.getComponent({ name: 'ElTransfer' })
+    const transferPanelLeft = transfer.getComponent({
+      ref: 'transfer-panel-left'
+    }).vm
+    const transferPanelRight = transfer.getComponent({
+      ref: 'transfer-panel-right'
+    }).vm
 
     expect(transferPanelLeft.defaultChecked).toEqual([2, 3])
     expect(transferPanelRight.defaultChecked).toEqual([1, 4])
   })
 
   it('transfer', async () => {
-    const Comp = createTransfer('v-model="value" :left-default-checked="[2, 3]" :right-default-checked="[4]"', {
-      setup() {
-        const state = reactive({
-          value: [1, 4]
-        })
+    const Comp = createTransfer(
+      'v-model="value" :left-default-checked="[2, 3]" :right-default-checked="[4]"',
+      {
+        setup() {
+          const state = reactive({
+            value: [1, 4]
+          })
 
-        return toRefs(state)
+          return toRefs(state)
+        }
       }
-    })
+    )
     const wrapper = mount(Comp)
-    const transfer = wrapper.getComponent({ name: 'ElTransfer'}).vm
+    const transfer = wrapper.getComponent({ name: 'ElTransfer' }).vm
 
     const transferLeft = wrapper.get('[data-test="transfer-panel-left"]')
     const transferRight = wrapper.get('[data-test="transfer-panel-right"]')
@@ -117,6 +164,25 @@ describe('Transfer', () => {
     expect(transfer.targetData.length).toEqual(3)
     expect(transferLeft.findAll('.el-transfer-panel__item')).toHaveLength(12)
     expect(transferRight.findAll('.el-transfer-panel__item')).toHaveLength(3)
+  })
+
+  it('titles', () => {
+    const Comp = createTransfer(':titles="titles"', {
+      setup() {
+        const state = reactive({
+          titles: ['列表1', '列表2']
+        })
+
+        return toRefs(state)
+      }
+    })
+
+    const wrapper = mount(Comp)
+    const header0 = wrapper.findAll('.el-transfer-panel_header')[0].element
+    const header1 = wrapper.findAll('.el-transfer-panel_header')[1].element
+
+    expect(header0.innerHTML).toEqual('列表1')
+    expect(header1.innerHTML).toEqual('列表2')
   })
 
   // it('filterable', async () => {

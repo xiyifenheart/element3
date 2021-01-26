@@ -1,10 +1,12 @@
 <template>
   <div class="el-transfer-panel">
+    <p class="el-transfer-panel_header">{{ title }}</p>
     <el-checkbox-group v-model="checked" @change="checkedChangeHandler">
       <el-checkbox
         class="el-transfer-panel__item"
-        :label="item.key"
-        :key="item.key"
+        :label="item[keyProp]"
+        :key="item[keyProp]"
+        :disabled="item[disabledProp]"
         v-for="item in data"
       >
       </el-checkbox>
@@ -23,16 +25,13 @@ export default {
     ElCheckbox
   },
   props: {
-    data: {
-      type: Array,
+    data: Array,
+    defaultChecked: Array,
+    props: Object,
+    title: {
+      type: String,
       default() {
-        return []
-      }
-    },
-    defaultChecked: {
-      type: Array,
-      default() {
-        return []
+        return ''
       }
     }
   },
@@ -48,13 +47,35 @@ export default {
       emit('checked-change', state.checked)
     }
 
+    const keyProp = computed(() => {
+      const { props: p } = props
+      return p.key || 'key'
+    })
+
+    const labelProp = computed(() => {
+      const { props: p } = props
+      return p.label || 'label'
+    })
+
+    const disabledProp = computed(() => {
+      const { props: p } = props
+      return p.disabled || 'disabled'
+    })
+
+    const title1 = computed(() => {
+      return props.title
+    })
+
     const checkedChangeHandler = (val) => {
       emit('checked-change', val)
     }
-
     return {
       ...toRefs(state),
-      checkedChangeHandler
+      keyProp,
+      labelProp,
+      disabledProp,
+      checkedChangeHandler,
+      title1
     }
   }
 }

@@ -1,6 +1,8 @@
 <template>
   <div class="el-transfer">
     <transfer-panel
+      v-bind="$props"
+      :title="titles[0]"
       :data="sourceData"
       :default-checked="leftDefaultChecked"
       @checked-change="onSourceCheckedChange"
@@ -21,6 +23,8 @@
       ></button>
     </div>
     <transfer-panel
+      v-bind="$props"
+      :title="titles[1]"
       :data="targetData"
       :default-checked="rightDefaultChecked"
       @checked-change="onTargetCheckedChange"
@@ -44,6 +48,9 @@ export default defineComponent({
   props,
   setup(props, { emit }) {
     const { sourceData, targetData } = useTransferData(props)
+    const titles = computed(() => {
+      return props.titles
+    })
 
     const {
       onSourceCheckedChange,
@@ -58,7 +65,8 @@ export default defineComponent({
       onSourceCheckedChange,
       onTargetCheckedChange,
       addToLeft,
-      addToRight
+      addToRight,
+      titles
     }
   }
 })
