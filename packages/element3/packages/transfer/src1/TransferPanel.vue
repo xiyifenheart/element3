@@ -62,7 +62,7 @@ export default {
       return p.disabled || 'disabled'
     })
 
-    const title1 = computed(() => {
+    const titleProp = computed(() => {
       return props.title
     })
 
@@ -75,7 +75,7 @@ export default {
       labelProp,
       disabledProp,
       checkedChangeHandler,
-      title1
+      titleProp
     }
   }
 }
