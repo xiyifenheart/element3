@@ -15,12 +15,16 @@
         class="el-transfer__button"
         @click="addToLeft"
         data-test="transfer__button-left"
-      ></button>
+      >
+        <span>{{ buttonTexts[0] }}</span>
+      </button>
       <button
         class="el-transfer__button"
         @click="addToRight"
         data-test="transfer__button-right"
-      ></button>
+      >
+        <span>{{ buttonTexts[1] }}</span>
+      </button>
     </div>
     <transfer-panel
       v-bind="$props"

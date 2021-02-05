@@ -29,6 +29,12 @@ export const props = {
       return []
     }
   },
+  buttonTexts: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
   leftDefaultChecked: {
     type: Array,
     default() {

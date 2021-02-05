@@ -185,6 +185,30 @@ describe('Transfer', () => {
     expect(header1.innerHTML).toEqual('列表2')
   })
 
+  it('button-texts', () => {
+    const buttonTexts = ['去左边', '去右边']
+    const Comp = createTransfer(':button-texts="buttonTexts"', {
+      setup() {
+        const state = reactive({
+          buttonTexts
+        })
+
+        return toRefs(state)
+      }
+    })
+
+    const wrapper = mount(Comp)
+    const buttonLeftSpan = wrapper.find(
+      '[data-test="transfer__button-left"] span'
+    ).element
+    const buttonRightSpan = wrapper.find(
+      '[data-test="transfer__button-right"] span'
+    ).element
+
+    expect(buttonLeftSpan.innerHTML).toEqual(buttonTexts[0])
+    expect(buttonRightSpan.innerHTML).toEqual(buttonTexts[1])
+  })
+
   // it('filterable', async () => {
   //   const Comp = createTransfer('v-model="value" filterable :filter-method="fliterMethod"', {
   //     setup() {
