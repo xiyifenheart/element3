@@ -2,7 +2,7 @@
   <div class="el-transfer">
     <transfer-panel
       v-bind="$props"
-      :title="titles[0]"
+      :title="leftTransferPanelTitle"
       :data="sourceData"
       :default-checked="leftDefaultChecked"
       @checked-change="onSourceCheckedChange"
@@ -28,7 +28,7 @@
     </div>
     <transfer-panel
       v-bind="$props"
-      :title="titles[1]"
+      :title="rightTransferPanelTitle"
       :data="targetData"
       :default-checked="rightDefaultChecked"
       @checked-change="onTargetCheckedChange"
@@ -39,6 +39,7 @@
   </div>
 </template>
 <script lang="ts">
+import { useLocale } from '../../../src/composables/locale'
 import { computed, defineComponent } from 'vue'
 import TransferPanel from './TransferPanel.vue'
 import { props } from './props'
@@ -51,7 +52,13 @@ export default defineComponent({
   },
   props,
   setup(props, { emit }) {
-    const { sourceData, targetData } = useTransferData(props)
+    const t = useLocale()
+    const {
+      leftTransferPanelTitle,
+      rightTransferPanelTitle,
+      sourceData,
+      targetData
+    } = useTransferData(props, t)
     const titles = computed(() => {
       return props.titles
     })
@@ -75,7 +82,15 @@ export default defineComponent({
   }
 })
 
-const useTransferData = (props) => {
+const useTransferData = (props, t) => {
+  const leftTransferPanelTitle = computed(() => {
+    return props.titles[0] || t('el.transfer.titles.0')
+  })
+
+  const rightTransferPanelTitle = computed(() => {
+    return props.titles[1] || t('el.transfer.titles.1')
+  })
+
   const sourceData = computed(() => {
     const { data, modelValue } = props
 
@@ -97,6 +112,8 @@ const useTransferData = (props) => {
   })
 
   return {
+    leftTransferPanelTitle,
+    rightTransferPanelTitle,
     sourceData,
     targetData
   }
