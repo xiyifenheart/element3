@@ -185,6 +185,43 @@ describe('Transfer', () => {
     expect(header1.innerHTML).toEqual('列表2')
   })
 
+  it('formatDefault', () => {
+    const Comp = createTransfer('', {})
+
+    const wrapper = mount(Comp)
+    const summaryLeft = wrapper.findAll('.el-transfer-panel_header-Summary')[0]
+      .element
+    const summaryRight = wrapper.findAll('.el-transfer-panel_header-Summary')[1]
+      .element
+
+    expect(summaryLeft.innerHTML).toEqual('0/15')
+    expect(summaryRight.innerHTML).toEqual('0/0')
+  })
+
+  it('format', () => {
+    const Comp = createTransfer(':format="formatObj"', {
+      setup() {
+        const state = reactive({
+          formatObj: {
+            noChecked: '${total}',
+            hasChecked: '${checked}/${total}'
+          }
+        })
+
+        return toRefs(state)
+      }
+    })
+
+    const wrapper = mount(Comp)
+    const summaryLeft = wrapper.findAll('.el-transfer-panel_header-Summary')[0]
+      .element
+    const summaryRight = wrapper.findAll('.el-transfer-panel_header-Summary')[1]
+      .element
+
+    expect(summaryLeft.innerHTML).toEqual('15')
+    expect(summaryRight.innerHTML).toEqual('0')
+  })
+
   it('button-texts', () => {
     const buttonTexts = ['去左边', '去右边']
     const Comp = createTransfer(':button-texts="buttonTexts"', {

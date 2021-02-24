@@ -1,6 +1,7 @@
 <template>
   <div class="el-transfer-panel">
     <p class="el-transfer-panel_header">{{ title }}</p>
+    <p class="el-transfer-panel_header-Summary">{{ checkedSummary }}</p>
     <el-checkbox-group v-model="checked" @change="checkedChangeHandler">
       <el-checkbox
         class="el-transfer-panel__item"
@@ -33,12 +34,18 @@ export default {
       default() {
         return ''
       }
-    }
+    },
+    format: Object
   },
   setup(props, { emit }) {
-    let state = reactive({
-      checked: []
-    })
+    const {
+      state,
+      keyProp,
+      labelProp,
+      disabledProp,
+      titleProp,
+      checkedSummary
+    } = useTransferPanelData(props, emit)
 
     if (props.defaultChecked.length > 0) {
       state.checked = computed(() => {
@@ -46,25 +53,6 @@ export default {
       })
       emit('checked-change', state.checked)
     }
-
-    const keyProp = computed(() => {
-      const { props: p } = props
-      return p.key || 'key'
-    })
-
-    const labelProp = computed(() => {
-      const { props: p } = props
-      return p.label || 'label'
-    })
-
-    const disabledProp = computed(() => {
-      const { props: p } = props
-      return p.disabled || 'disabled'
-    })
-
-    const titleProp = computed(() => {
-      return props.title
-    })
 
     const checkedChangeHandler = (val) => {
       emit('checked-change', val)
@@ -75,8 +63,54 @@ export default {
       labelProp,
       disabledProp,
       checkedChangeHandler,
-      titleProp
+      titleProp,
+      checkedSummary
     }
+  }
+}
+
+const useTransferPanelData = (props) => {
+  const { props: p, format, data } = props
+  let state = reactive({
+    checked: []
+  })
+  const keyProp = computed(() => {
+    return p.key || 'key'
+  })
+
+  const labelProp = computed(() => {
+    return p.label || 'label'
+  })
+
+  const disabledProp = computed(() => {
+    return p.disabled || 'disabled'
+  })
+
+  const titleProp = computed(() => {
+    return p.title
+  })
+
+  const checkedSummary = computed(() => {
+    const { noChecked, hasChecked } = format
+    const checkedLength = state.checked.length
+    const dataLength = data.length
+    if (noChecked && hasChecked) {
+      const targetStr = checkedLength > 0 ? hasChecked : noChecked
+      return targetStr
+        .replace(/\${checked}/g, checkedLength)
+        .replace(/\${total}/g, dataLength)
+    }
+
+    return `${checkedLength}/${dataLength}`
+  })
+
+  return {
+    state,
+    keyProp,
+    labelProp,
+    disabledProp,
+    titleProp,
+    checkedSummary
   }
 }
 </script>

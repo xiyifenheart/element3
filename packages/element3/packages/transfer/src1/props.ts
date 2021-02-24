@@ -29,6 +29,15 @@ export const props = {
       return []
     }
   },
+  format: {
+    type: Object,
+    default() {
+      return {
+        nochecked: '${checked}/${total}',
+        hasChecked: '${checked}/${total}'
+      }
+    }
+  },
   buttonTexts: {
     type: Array,
     default() {
