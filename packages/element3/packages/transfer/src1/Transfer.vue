@@ -11,20 +11,25 @@
     >
     </transfer-panel>
     <div class="el-transfer__buttons">
-      <button
+      <el-button
+        type="primary"
         class="el-transfer__button"
         @click="addToLeft"
         data-test="transfer__button-left"
+        :disabled="rightChecked.length === 0"
       >
-        <span>{{ buttonTexts[0] }}</span>
-      </button>
-      <button
+        <i class="el-icon-arrow-left"></i>
+        <span v-if="buttonTexts[0] !== undefined">{{ buttonTexts[0] }}</span>
+      </el-button>
+      <el-button
+        type="primary"
         class="el-transfer__button"
         @click="addToRight"
         data-test="transfer__button-right"
       >
-        <span>{{ buttonTexts[1] }}</span>
-      </button>
+        <span v-if="buttonTexts[1] !== undefined">{{ buttonTexts[1] }}</span>
+        <i class="el-icon-arrow-right"></i>
+      </el-button>
     </div>
     <transfer-panel
       v-bind="$props"
@@ -39,20 +44,82 @@
   </div>
 </template>
 <script lang="ts">
+// import { props } from './props'
+const props = {
+  data: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
+  modelValue: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
+  props: {
+    type: Object,
+    default() {
+      return {
+        key: 'key',
+        label: 'label',
+        disabled: 'disabled'
+      }
+    }
+  },
+  titles: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
+  format: {
+    type: Object,
+    default() {
+      return {
+        nochecked: '${checked}/${total}',
+        hasChecked: '${checked}/${total}'
+      }
+    }
+  },
+  buttonTexts: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
+  leftDefaultChecked: {
+    type: Array,
+    default() {
+      return []
+    }
+  },
+  rightDefaultChecked: {
+    type: Array,
+    default() {
+      return []
+    }
+  }
+}
 import { useLocale } from '../../../src/composables/locale'
-import { computed, defineComponent } from 'vue'
+import { ref, computed, defineComponent } from 'vue'
 import TransferPanel from './TransferPanel.vue'
-import { props } from './props'
+import { ElButton } from '../../../src/components/Button'
 export default defineComponent({
   name: 'ElTransfer',
 
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'change'],
   components: {
-    TransferPanel
+    TransferPanel,
+    ElButton
   },
   props,
   setup(props, { emit }) {
     const t = useLocale()
+
+    const leftChecked = ref([])
+    const rightChecked = ref([])
     const {
       leftTransferPanelTitle,
       rightTransferPanelTitle,
@@ -68,13 +135,17 @@ export default defineComponent({
       onTargetCheckedChange,
       addToLeft,
       addToRight
-    } = useTransfercheckedChange(props, emit)
+    } = useTransfercheckedChange(props, emit, leftChecked, rightChecked)
 
     return {
+      leftTransferPanelTitle,
+      rightTransferPanelTitle,
       sourceData,
       targetData,
       onSourceCheckedChange,
       onTargetCheckedChange,
+      leftChecked,
+      rightChecked,
       addToLeft,
       addToRight,
       titles
@@ -92,23 +163,27 @@ const useTransferData = (props, t) => {
   })
 
   const sourceData = computed(() => {
-    const { data, modelValue } = props
+    const { data, modelValue, props: p } = props
 
     if (modelValue.length === 0) {
       return data.slice()
     }
 
-    return data.filter((item) => modelValue.indexOf(item.key) === -1)
+    const arr = data.filter((item) => modelValue.indexOf(item[p.key]) === -1)
+
+    return arr
   })
 
   const targetData = computed(() => {
-    const { data, modelValue } = props
+    const { data, modelValue, props: p } = props
 
     if (modelValue.length === 0) {
       return []
     }
 
-    return data.filter((item) => modelValue.indexOf(item.key) > -1)
+    const arr = data.filter((item) => modelValue.indexOf(item[p.key]) > -1)
+
+    return arr
   })
 
   return {
@@ -119,41 +194,44 @@ const useTransferData = (props, t) => {
   }
 }
 
-const useTransfercheckedChange = (props, emit) => {
-  let sourceChecked = []
-  let targetChecked = []
-
+const useTransfercheckedChange = (props, emit, leftChecked, rightChecked) => {
   const onSourceCheckedChange = (val) => {
-    sourceChecked = val
+    leftChecked.value = val
   }
 
   const onTargetCheckedChange = (val) => {
-    targetChecked = val
+    rightChecked.value = val
   }
 
   const addToLeft = () => {
-    if (targetChecked.length === 0) {
+    if (rightChecked.value.length === 0) {
       return
     }
     const { modelValue } = props
     const currentValue = modelValue.slice()
 
-    for (let i = 0; i < targetChecked.length; i++) {
-      if (currentValue.indexOf(targetChecked[i]) > -1) {
-        currentValue.splice(i, 1)
+    for (let i = 0; i < rightChecked.value.length; i++) {
+      const index = currentValue.indexOf(rightChecked.value[i])
+      if (index > -1) {
+        currentValue.splice(index, 1)
       }
     }
 
     emit('update:modelValue', currentValue)
+    emit('change', currentValue, 'left', rightChecked.value)
   }
 
   const addToRight = () => {
-    if (sourceChecked.length === 0) {
+    if (leftChecked.value.length === 0) {
       return
     }
+
     const { modelValue } = props
-    const arr = Array.from(new Set([].concat(modelValue, sourceChecked)))
-    emit('update:modelValue', arr)
+    const currentValue = Array.from(
+      new Set([].concat(modelValue, leftChecked.value))
+    )
+    emit('update:modelValue', currentValue)
+    emit('change', currentValue, 'right', leftChecked.value)
   }
 
   return {

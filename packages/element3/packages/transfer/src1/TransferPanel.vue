@@ -1,17 +1,34 @@
 <template>
   <div class="el-transfer-panel">
-    <p class="el-transfer-panel_header">{{ title }}</p>
-    <p class="el-transfer-panel_header-Summary">{{ checkedSummary }}</p>
-    <el-checkbox-group v-model="checked" @change="checkedChangeHandler">
+    <p class="el-transfer-panel__header">
       <el-checkbox
-        class="el-transfer-panel__item"
-        :label="item[keyProp]"
-        :key="item[keyProp]"
-        :disabled="item[disabledProp]"
-        v-for="item in data"
+        v-model="allChecked"
+        @change="handleAllCheckedChange"
+        :indeterminate="isIndeterminate"
       >
+        {{ title }}
+        <span class="el-transfer-panel__header-Summary">{{
+          checkedSummary
+        }}</span>
       </el-checkbox>
-    </el-checkbox-group>
+    </p>
+    <div class="el-transfer-panel__body">
+      <el-checkbox-group
+        v-model="checked"
+        @change="checkedChangeHandler"
+        class="el-transfer-panel__list"
+      >
+        <el-checkbox
+          class="el-transfer-panel__item"
+          :label="item[keyProp]"
+          :key="item[keyProp]"
+          :disabled="item[disabledProp]"
+          v-for="item in data"
+        >
+          {{ item[labelProp] }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </div>
   </div>
 </template>
 <script>
@@ -44,10 +61,12 @@ export default {
       labelProp,
       disabledProp,
       titleProp,
-      checkedSummary
+      checkedSummary,
+      isIndeterminate
     } = useTransferPanelData(props, emit)
 
     if (props.defaultChecked.length > 0) {
+      // state.checked = props.defaultChecked.slice()
       state.checked = computed(() => {
         return props.defaultChecked
       })
@@ -57,12 +76,20 @@ export default {
     const checkedChangeHandler = (val) => {
       emit('checked-change', val)
     }
+
+    const handleAllCheckedChange = (val) => {
+      state.checked = val ? props.data.map((item) => item[keyProp.value]) : []
+      emit('checked-change', state.checked)
+    }
+
     return {
       ...toRefs(state),
       keyProp,
       labelProp,
       disabledProp,
       checkedChangeHandler,
+      handleAllCheckedChange,
+      isIndeterminate,
       titleProp,
       checkedSummary
     }
@@ -72,7 +99,8 @@ export default {
 const useTransferPanelData = (props) => {
   const { props: p, format, data } = props
   let state = reactive({
-    checked: []
+    checked: [],
+    allChecked: false
   })
   const keyProp = computed(() => {
     return p.key || 'key'
@@ -104,13 +132,19 @@ const useTransferPanelData = (props) => {
     return `${checkedLength}/${dataLength}`
   })
 
+  const isIndeterminate = computed(() => {
+    const checkedLength = state.checked.length
+    return checkedLength > 0 && checkedLength < data.length
+  })
+
   return {
     state,
     keyProp,
     labelProp,
     disabledProp,
     titleProp,
-    checkedSummary
+    checkedSummary,
+    isIndeterminate
   }
 }
 </script>

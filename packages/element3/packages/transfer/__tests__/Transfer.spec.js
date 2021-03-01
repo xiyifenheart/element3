@@ -178,21 +178,22 @@ describe('Transfer', () => {
     })
 
     const wrapper = mount(Comp)
-    const header0 = wrapper.findAll('.el-transfer-panel_header')[0].element
-    const header1 = wrapper.findAll('.el-transfer-panel_header')[1].element
+    const header0 = wrapper.findAll('.el-transfer-panel__header')[0].element
+    const header1 = wrapper.findAll('.el-transfer-panel__header')[1].element
 
-    expect(header0.innerHTML).toEqual('列表1')
-    expect(header1.innerHTML).toEqual('列表2')
+    expect(header0.innerHTML).toContain('列表1')
+    expect(header1.innerHTML).toContain('列表2')
   })
 
   it('formatDefault', () => {
     const Comp = createTransfer('', {})
 
     const wrapper = mount(Comp)
-    const summaryLeft = wrapper.findAll('.el-transfer-panel_header-Summary')[0]
+    const summaryLeft = wrapper.findAll('.el-transfer-panel__header-Summary')[0]
       .element
-    const summaryRight = wrapper.findAll('.el-transfer-panel_header-Summary')[1]
-      .element
+    const summaryRight = wrapper.findAll(
+      '.el-transfer-panel__header-Summary'
+    )[1].element
 
     expect(summaryLeft.innerHTML).toEqual('0/15')
     expect(summaryRight.innerHTML).toEqual('0/0')
@@ -213,10 +214,11 @@ describe('Transfer', () => {
     })
 
     const wrapper = mount(Comp)
-    const summaryLeft = wrapper.findAll('.el-transfer-panel_header-Summary')[0]
+    const summaryLeft = wrapper.findAll('.el-transfer-panel__header-Summary')[0]
       .element
-    const summaryRight = wrapper.findAll('.el-transfer-panel_header-Summary')[1]
-      .element
+    const summaryRight = wrapper.findAll(
+      '.el-transfer-panel__header-Summary'
+    )[1].element
 
     expect(summaryLeft.innerHTML).toEqual('15')
     expect(summaryRight.innerHTML).toEqual('0')
@@ -242,8 +244,8 @@ describe('Transfer', () => {
       '[data-test="transfer__button-right"] span'
     ).element
 
-    expect(buttonLeftSpan.innerHTML).toEqual(buttonTexts[0])
-    expect(buttonRightSpan.innerHTML).toEqual(buttonTexts[1])
+    expect(buttonLeftSpan.innerHTML).toContain(buttonTexts[0])
+    expect(buttonRightSpan.innerHTML).toContain(buttonTexts[1])
   })
 
   // it('filterable', async () => {

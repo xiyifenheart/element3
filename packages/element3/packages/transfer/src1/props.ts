@@ -1,5 +1,3 @@
-import { PropType } from 'vue'
-
 export const props = {
   data: {
     type: Array,
